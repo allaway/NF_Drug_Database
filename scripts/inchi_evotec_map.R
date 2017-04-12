@@ -5,8 +5,7 @@ library(biomaRt)
 library(webchem)
 synapseLogin()
 
-this.file = ""
-
+this.file = "https://raw.githubusercontent.com/allaway/NF_Drug_Database/master/scripts/inchi_evotec_map.R"
 
 ## pull drug data and filter for human targets, and eliminate drugs with
 ## 0 quantitative effects measured
@@ -63,4 +62,4 @@ alldat<-rbind(data,data1,data2,data3,data4,data5)
 alldat$smiles <- rownames(alldat)
 
 write.table(alldat, "inchikey_smiles_map.txt", sep = "\t", row.names = FALSE)
-synStore(File("inchikey_smiles_map.txt", parentId = ))
+synStore(File("inchikey_smiles_map.txt", parentId = "syn8682571"), executed = this.file, used = c("syn8118065","syn7341038"))
