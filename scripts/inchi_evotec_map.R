@@ -60,6 +60,29 @@ colnames(data5) <- "inchi"
 
 alldat<-rbind(data,data1,data2,data3,data4,data5)
 alldat$smiles <- rownames(alldat)
+alldat$inchikey <- gsub("InChIKey=", "", alldat$inchikey)
+
+##59 smiles didnt map to inchikeys, these were mapped with pubchem ID Exchange service 
+unmapped<-dplyr::select(filter(alldat, is.na(inchikey)),smiles)
+write.table(unmapped, "unmapped.txt", sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
+nowmapped<-read.table("unmappedNowMapped.txt", comment.char = "", sep = "\t")
+colnames(nowmapped)<-c("smiles", "inchikey")
+nowmapped<-dplyr::select(nowmapped, inchikey, smiles)
+alldat<-bind_rows(filter(alldat, !is.na(inchikey)), nowmapped)
+
+#nine remain unmapped (really noncanonical smiles?) - map manually with pubchem structure search
+alldat$inchikey[alldat$smiles=="CC(C)[C@@H]1NC(=O)[C@H](CCCCN)NC(=O)[C@@H](CC2=CNC3=C2C=CC=C3)NC(=O)[C@H](CC2=CC=C(O)C=C2)NC(=O)[C@H](C)N(C)C(=O)[C@H](CC2=CC=CC=C2)NC1=O"] <- "NPJIOCBFOAHEDO-AVWFULIKSA-N"
+alldat$inchikey[alldat$smiles=="BrCCCBr.CN(C)CCCCCCN(C)C"] <- "KZKAYEGOIJEWQB-UHFFFAOYSA-N"
+alldat$inchikey[alldat$smiles=="[H]N1C(=O)C(C%23N)=C(NC2=CC(C)=CC=C2)SC11CCCC1"] <- "PZKAUBRBLGYPFT-UHFFFAOYSA-N"
+alldat$inchikey[alldat$smiles=="C1=CC2=CC3=C(C=CC=C3)C=C2C=C1"] <- "MWPLVEDNUUSJAV-UHFFFAOYSA-N"
+alldat$inchikey[alldat$smiles=="CC1=NC(C(=O)NCC(O)=O)=C(O)C2=CC=C(OC3=CC=CC=C3)C=C12"] <- "YOZBGTLTNGAVFU-UHFFFAOYSA-N"
+alldat$inchikey[alldat$smiles=="[Na+].[Na+].[Na+].CC1=C(O)C(C=O)=C(COP([O-])([O-])=O)C(N=NC2=CC=C(C=C2)C([O-])=O)=N1"] <- "PBGKQYOUZYMMOR-UHFFFAOYSA-K"
+alldat$inchikey[alldat$smiles=="CC1=NC2=C(C=C(C=C2N1CC1=CC=CC(=C1C)C(F)(F)F)N1CCOCC1)C(O)=O"] <- "XTKLTGBKIDQGQL-UHFFFAOYSA-N"
+alldat$inchikey[alldat$smiles=="CC1=NN(C(C)=C1C=NN1CCN(CC2=CC=CC=C2)CC1)C1=CC=CC=C1"] <- "FOORCIAZMIWALX-UHFFFAOYSA-N"
+alldat$inchikey[alldat$smiles=="ClC1=C(N=C2NN=C(NC(=O)C3CC3)C2=C1)C1=CC=CC=C1"] <- "DOKPTPBHIRPUBR-UHFFFAOYSA-N"
+
 
 write.table(alldat, "inchikey_smiles_map.txt", sep = "\t", row.names = FALSE)
-synStore(File("inchikey_smiles_map.txt", parentId = "syn8682571"), executed = this.file, used = c("syn8118065","syn7341038"))
+synStore(File("inchikey_smiles_map.txt", parentId = "syn8682571"), executed = this.file, used = c("syn8118065","syn7341038", "https://pubchem.ncbi.nlm.nih.gov/idexchange/idexchange.cgi", "https://pubchem.ncbi.nlm.nih.gov/search/#collection=compounds&query_type=structure&query_subtype=identity"))
+
+
