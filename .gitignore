@@ -1,7 +1,7 @@
-.txt
-.xlsx
-.pdf
-.png
-.tif
-.jpg
-.docx
+*.xlsx
+*.pdf
+*.png
+*.tif
+*.jpg
+*.docx
+*.txt
